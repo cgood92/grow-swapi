@@ -4,8 +4,7 @@
   "description": "A demo app of Express and EJS",
   "main": "bin/www",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node bin/www"
   },
   "repository": {
     "type": "git",
@@ -16,5 +15,10 @@
   "bugs": {
     "url": "https://github.com/cgood92/grow-swapi/issues"
   },
-  "homepage": "https://github.com/cgood92/grow-swapi#readme"
+  "homepage": "https://github.com/cgood92/grow-swapi#readme",
+  "dependencies": {
+    "ejs": "^2.5.3",
+    "express": "^4.14.0",
+    "request": "^2.79.0"
+  }
 }
