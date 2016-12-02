@@ -85,7 +85,7 @@ let _continueToFetch = function _continueToFetch(endpoint, userPage, limit, sort
 	deal with querying the data, not on presenting it.  If this was a DB query in the
 	api, then we would have that logic here...
 */
-let characters = function characters(page = 1, limit = 10, sort = "name"){
+let characters = (page = 1, limit = 10, sort = "name") => {
 	return new Promise((resolve, reject) => {
 		_continueToFetch('people', page, limit, sort, [], 1, resolve);
 	});
