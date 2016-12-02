@@ -19,7 +19,7 @@ app.get('/character/:name', (req, res, next) => {
 				res.locals.data = data;
 				next();
 			});
-		}).catch((err) => next(err));
+		}).catch((err) => next(err || {}));
 	},
 	(req, res, next) => {
 		res.render('character', res.locals.data);
@@ -34,7 +34,7 @@ app.get('/characters', (req, res, next) => {
 			res.json(data);
 			next();
 		});
-	}).catch((err) => next(err));
+	}).catch((err) => next(err || {}));
 });
 
 app.get('/planetresidents', (req, res, next) => {
@@ -43,7 +43,7 @@ app.get('/planetresidents', (req, res, next) => {
 			res.json(data);
 			next();
 		});
-	}).catch((err) => next(err));
+	}).catch((err) => next(err || {}));
 });
 
 app.use((err, req, res, next) => {
