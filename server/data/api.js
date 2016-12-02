@@ -17,7 +17,6 @@ let buildUrl = (path, param, query) => {
 
 let get = (url) => {
 	return new Promise((resolve, reject) => {
-		// TODO: memoize
 		request(url, (error, response, body) => {
 			console.log(response.request.href);
 			if (!error && response.statusCode == 200) {
