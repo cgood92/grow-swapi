@@ -30,7 +30,13 @@ let get = (url) => {
 
 let character = (name) => {
 	return new Promise((resolve, reject) => {
-		get(buildUrl('people', null, { search: name })).then((data) => resolve(data)).catch((err) => reject(err));
+		get(buildUrl('people', null, { search: name })).then((data) => {
+			if (data.results.length) {
+				resolve(data);
+			} else {
+				reject();
+			}
+		}).catch((err) => reject(err));
 	});
 };
 
