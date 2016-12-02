@@ -1,0 +1,20 @@
+{
+  "name": "grow-swapi",
+  "version": "1.0.0",
+  "description": "A demo app of Express and EJS",
+  "main": "bin/www",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cgood92/grow-swapi.git"
+  },
+  "author": "Clint Goodman",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cgood92/grow-swapi/issues"
+  },
+  "homepage": "https://github.com/cgood92/grow-swapi#readme"
+}
