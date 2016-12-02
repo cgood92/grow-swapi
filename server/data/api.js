@@ -66,12 +66,12 @@ let _sort = (key) => {
 /*
 	Keep fetching more results until the limit has been reached.  Doing this method does NOT mean that, when returning the sorted array, the sorted array is comprehensive of all results.  It simply means that we found X number of people, and then sorted those X number of people by the sort.  So, if you sort by "name", then not all "A" names will be on the first page, unless your limit >= total.  In short, we are slicing and then sorting, whereas a true "Google" like experience would be sort then slice.  But, since the instructions indicated that the results returned didn't matter, and rather than make more calls than are necessary (only to sort and splice later), this is a quick/lean method.
 */
-let _continueToFetch = function _continueToFetch(userPage, limit, sort, total, page, resolve) {
-	get(buildUrl('people', null, { page })).then((data) => {
+let _continueToFetch = function _continueToFetch(endpoint, userPage, limit, sort, total, page, resolve) {
+	get(buildUrl(endpoint, null, { page })).then((data) => {
 		let concated = total.concat(data.results),
 			totalLength = concated.length;
 		if (totalLength < (limit*userPage) && data.next) {
-			_continueToFetch(userPage, limit, sort, concated, page+1, resolve);
+			_continueToFetch(endpoint, userPage, limit, sort, concated, page+1, resolve);
 		} else {
 			let startingIndex = _getPageNum(totalLength, userPage, limit);
 			let results = concated.slice(startingIndex, startingIndex+limit).sort(_sort(sort));
@@ -87,13 +87,25 @@ let _continueToFetch = function _continueToFetch(userPage, limit, sort, total, p
 */
 let characters = function characters(page = 1, limit = 10, sort = "name"){
 	return new Promise((resolve, reject) => {
-		_continueToFetch(page, limit, sort, [], 1, resolve)
+		_continueToFetch('people', page, limit, sort, [], 1, resolve);
 	});
 };
 
-let residents = (limit) => {
+let residents = () => {
 	return new Promise((resolve, reject) => {
-		get(buildUrl('people', null, { search: name })).then((data) => resolve(data)).catch((err) => reject(err));
+		_continueToFetch('planets', 1, 1000, 'name', [], 1, (planets) => {
+			let promises = [];
+			planets.forEach((planet) => {
+				planet.residents.forEach((residentUrl, index) => {
+					promises.push(url(residentUrl).then((person) => {
+						planet.residents[index] = person.name;
+					}));
+				});
+			});
+			Promise.all(promises).then(() => {
+				resolve(planets);
+			}).catch((err) => reject(err));
+		});
 	});
 };
 
