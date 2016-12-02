@@ -1,6 +1,7 @@
 'use strict';
 
-var request = require('request');
+var request = require('request'),
+	memoize = require('memoizee');
 
 let buildUrl = (path, param, query) => {
 	let base = `http://swapi.co/api/${path}/`;
@@ -28,9 +29,11 @@ let get = (url) => {
 	});
 };
 
+let cache = memoize(get);
+
 let character = (name) => {
 	return new Promise((resolve, reject) => {
-		get(buildUrl('people', null, { search: name })).then((data) => {
+		cache(buildUrl('people', null, { search: name })).then((data) => {
 			if (data.results.length) {
 				resolve(data);
 			} else {
@@ -73,7 +76,7 @@ let _sort = (key) => {
 	Keep fetching more results until the limit has been reached.  Doing this method does NOT mean that, when returning the sorted array, the sorted array is comprehensive of all results.  It simply means that we found X number of people, and then sorted those X number of people by the sort.  So, if you sort by "name", then not all "A" names will be on the first page, unless your limit >= total.  In short, we are slicing and then sorting, whereas a true "Google" like experience would be sort then slice.  But, since the instructions indicated that the results returned didn't matter, and rather than make more calls than are necessary (only to sort and splice later), this is a quick/lean method.
 */
 let _continueToFetch = function _continueToFetch(endpoint, userPage, limit, sort, total, page, resolve) {
-	get(buildUrl(endpoint, null, { page })).then((data) => {
+	cache(buildUrl(endpoint, null, { page })).then((data) => {
 		let concated = total.concat(data.results),
 			totalLength = concated.length;
 		if (totalLength < (limit*userPage) && data.next) {
@@ -117,7 +120,7 @@ let residents = () => {
 
 let url = (url) => {
 	return new Promise((resolve, reject) => {
-		get(url).then((data) => resolve(data)).catch((err) => reject(err));
+		cache(url).then((data) => resolve(data)).catch((err) => reject(err));
 	});
 };
 
