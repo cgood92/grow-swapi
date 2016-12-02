@@ -11,8 +11,10 @@ app.set('view engine', 'ejs');
 
 app.get('/', (req, res, next) => {
 		api.character('luke').then((data) => {
-			res.locals.data = transform.character(data);
-			next();
+			transform.character(data).then((data) => {
+				res.locals.data = data;
+				next();
+			});
 		}).catch((err) => next(err));
 	},
 	(req, res, next) => {
@@ -21,7 +23,7 @@ app.get('/', (req, res, next) => {
 	});
 
 app.use((err, req, res, next) => {
-	var msg = err.toString() || "There was an error...";
+	var msg = err.msg || err.toString() || "There was an error...";
 	res.status(err.status || 500).render('error', { msg });
 	next();
 });

@@ -2,9 +2,22 @@
 
 var request = require('request');
 
-let get = (path, query) => {
+let buildUrl = (path, param, query) => {
+	let base = `http://swapi.co/api/${path}/`;
+	if (param) {
+		base += `${param}/`;
+	}
+	if (query) {
+		let string = Object.keys(query).map((key) => `${key}=${query[key]}`);
+		base += '?' + string.join('&');
+	}
+	return base;
+};
+
+let get = (url) => {
 	return new Promise((resolve, reject) => {
-		request(`http://swapi.co/api/${path}/?search=${query}`, (error, response, body) => {
+		request(url, (error, response, body) => {
+			console.log(response.request.href);
 			if (!error && response.statusCode == 200) {
 				resolve(JSON.parse(body));
 			} else {
@@ -16,11 +29,18 @@ let get = (path, query) => {
 
 let character = (name) => {
 	return new Promise((resolve, reject) => {
-		get('people', name).then((data) => resolve(data)).catch((err) => reject(err));
+		get(buildUrl('people', null, { search: name })).then((data) => resolve(data)).catch((err) => reject(err));
+	});
+};
+
+let url = (url) => {
+	return new Promise((resolve, reject) => {
+		get(url).then((data) => resolve(data)).catch((err) => reject(err));
 	});
 };
 
 module.exports = {
-	character
+	character,
+	url
 };
 
