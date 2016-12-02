@@ -1,14 +1,29 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <style type="text/css">
+            h3, p {
+                display: inline-block;
+            }
+            ul {
+                margin: 0;
+                padding: 0;       
+                list-style: none;
+            }
+            li {
+                display: block;
+            }
+        </style>
     </head>
     <body>
         <main>
         	<h2><%= name %></h2>
-        	<h3>Birth:</h3><p><%= birth %></p>
-        	<h3>Gender:</h3><p><%= gender %></p>
-        	<h3>Home:</h3><p><%= home %></p>
-        	<h3>Films:</h3><p><%= films %></p>
+            <ul>
+        	<li><h3>Birth:</h3> <p><%= birth %></p></li>
+        	<li><h3>Gender:</h3> <p><%= gender %></p></li>
+        	<li><h3>Home:</h3> <p><%= home %></p></li>
+        	<li><h3>Films:</h3> <p><%= films %></p></li>
+            </ul>
         </main>
 </body>
 </html>
