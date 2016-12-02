@@ -10,7 +10,11 @@ app.set('views', path.join(__dirname, '/client/src'));
 app.set('view engine', 'ejs');
 
 app.get('/', (req, res, next) => {
-		api.character('luke').then((data) => {
+	res.render('home');
+});
+
+app.get('/character/:name', (req, res, next) => {
+		api.character(req.params.name).then((data) => {
 			transform.character(data).then((data) => {
 				res.locals.data = data;
 				next();
@@ -20,7 +24,27 @@ app.get('/', (req, res, next) => {
 	(req, res, next) => {
 		res.render('character', res.locals.data);
 		next();
-	});
+	}
+);
+
+app.get('/characters', (req, res, next) => {
+	let { page, limit, sort } =  req.query;
+	api.characters(page, limit, sort).then((data) => {
+		transform.characters(data).then((data) => {
+			res.json(data);
+			next();
+		});
+	}).catch((err) => next(err));
+});
+
+app.get('/planetresidents', (req, res, next) => {
+	api.residents().then((data) => {
+		transform.residents(data).then((data) => {
+			res.json(data);
+			next();
+		});
+	}).catch((err) => next(err));
+});
 
 app.use((err, req, res, next) => {
 	var msg = err.msg || err.toString() || "There was an error...";

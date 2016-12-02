@@ -23,6 +23,24 @@ let character = (raw) => {
 	});
 };
 
+/* Why have these functions here, if they just return the raw data?  
+   In case one day they would want to change something, such as swapping out URLs
+   for the data they would contain, etc.
+*/
+let characters = (raw) => {
+	return new Promise((resolve, reject) => {
+		resolve(raw);
+	});
+};
+
+let residents = (raw) => {
+	return new Promise((resolve, reject) => {
+		resolve(raw);
+	});
+};
+
 module.exports = {
-	character
+	character,
+	characters,
+	residents
 };

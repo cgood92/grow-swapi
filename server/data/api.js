@@ -16,6 +16,7 @@ let buildUrl = (path, param, query) => {
 
 let get = (url) => {
 	return new Promise((resolve, reject) => {
+		// TODO: memoize
 		request(url, (error, response, body) => {
 			console.log(response.request.href);
 			if (!error && response.statusCode == 200) {
@@ -33,6 +34,69 @@ let character = (name) => {
 	});
 };
 
+let _getPageNum = (length, page, limit) => {
+	if (page < 1) {
+		page = 1;
+	} 
+
+	let target = ((page - 1)*limit);
+
+	if (target > length) {
+		target = length - limit;
+	}
+
+	return target;
+};
+
+let _sort = (key) => {
+	return (a,b) => {
+		// Sort by the key specified (unless that key doens't exist, in which case sort by name)
+		let aVal = a[key] || a.name,
+			bVal = b[key] || b.name;
+		if (aVal < bVal) {
+			return -1;
+		} else if (aVal > bVal) {
+			return 1;
+		} else {
+			return 0;
+		}
+	};
+};
+
+/*
+	Keep fetching more results until the limit has been reached.  Doing this method does NOT mean that, when returning the sorted array, the sorted array is comprehensive of all results.  It simply means that we found X number of people, and then sorted those X number of people by the sort.  So, if you sort by "name", then not all "A" names will be on the first page, unless your limit >= total.  In short, we are slicing and then sorting, whereas a true "Google" like experience would be sort then slice.  But, since the instructions indicated that the results returned didn't matter, and rather than make more calls than are necessary (only to sort and splice later), this is a quick/lean method.
+*/
+let _continueToFetch = function _continueToFetch(userPage, limit, sort, total, page, resolve) {
+	get(buildUrl('people', null, { page })).then((data) => {
+		let concated = total.concat(data.results),
+			totalLength = concated.length;
+		if (totalLength < (limit*userPage) && data.next) {
+			_continueToFetch(userPage, limit, sort, concated, page+1, resolve);
+		} else {
+			let startingIndex = _getPageNum(totalLength, userPage, limit);
+			let results = concated.slice(startingIndex, startingIndex+limit).sort(_sort(sort));
+			resolve(results);
+		}
+	});
+};
+
+/* 
+	Why put limit + sort here, instead of in the transform?  Because these params
+	deal with querying the data, not on presenting it.  If this was a DB query in the
+	api, then we would have that logic here...
+*/
+let characters = function characters(page = 1, limit = 10, sort = "name"){
+	return new Promise((resolve, reject) => {
+		_continueToFetch(page, limit, sort, [], 1, resolve)
+	});
+};
+
+let residents = (limit) => {
+	return new Promise((resolve, reject) => {
+		get(buildUrl('people', null, { search: name })).then((data) => resolve(data)).catch((err) => reject(err));
+	});
+};
+
 let url = (url) => {
 	return new Promise((resolve, reject) => {
 		get(url).then((data) => resolve(data)).catch((err) => reject(err));
@@ -41,6 +105,8 @@ let url = (url) => {
 
 module.exports = {
 	character,
+	characters,
+	residents,
 	url
 };
 
